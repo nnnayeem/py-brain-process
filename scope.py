@@ -3,7 +3,6 @@ import numpy as np
 from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-import threading
 
 
 class Scope:
@@ -58,25 +57,25 @@ class Scope:
 
         yield 0.
 
-    def start(self):
+    def start(self, fig):
         ani = animation.FuncAnimation(fig, self.update, self.emitter1, interval=50, blit=True)
         plt.show()
 
     def generate(self):
         while 1:
-            scope.data.append(np.random.rand(1))
+            self.data.append(np.random.rand(1))
             time.sleep(0.01)
 
 
 # Fixing random state for reproducibility
-np.random.seed(19680801 // 10)
-
-fig, ax = plt.subplots()
-scope = Scope(ax)
-s1 = threading.Thread(target=scope.generate, daemon=True)
-s1.start()
-s2 = threading.Thread(target=scope.start(), daemon=True)
-s2.start()
+# np.random.seed(19680801 // 10)
+#
+# fig, ax = plt.subplots()
+# scope = Scope(ax)
+# s1 = threading.Thread(target=scope.generate, daemon=True)
+# s1.start()
+# s2 = threading.Thread(target=scope.start(), daemon=True)
+# s2.start()
 
 
 

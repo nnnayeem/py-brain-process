@@ -1,40 +1,48 @@
-import numpy as np
+import time
+import serial
+from scope import Scope
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-import random
-
-fig, ax = plt.subplots()
-xdata, ydata = [0], [0]
-ln, = plt.plot([], [], 'ro')
+import threading
 
 
-def init():
-    ax.set_xlim(0, 100)
-    ax.set_ylim(0, 100)
-    return fig,
+class Main:
+
+    def __init__(self):
+        print("initiated")
+       
+    def run(self):
+        with serial.Serial('COM4', 115200, timeout=1) as ser:    
+            print("Found serial port com1")
+            attempt = 0
+            while 1:
+                if attempt == 5: break
+                fileIndex = input("Enter data save index (1-5) To initiate compair mode press c:")
+                filename = "data.{findex}.txt".format(findex = fileIndex)
+
+                i = 0
+                while 1:
+                    if ser.in_waiting > 0:
+                        data = ser.read(5)
+                        data = data.decode('utf-8')
+                        with open(filename, 'a') as out:
+                            out.write(data)
+                        i = i + 1
+                        print(i)
+                        if i == 200: break
+                    time.sleep(0.01)
+                attempt = attempt + 1
 
 
-def update(frame):
-    print(frame)
-    xdata.append(frame)
-    ydata.append(np.sin(frame))
-    ln.set_data(xdata, ydata)
-    return ln,
+if __name__ == "__main__":
+    fig, ax = plt.subplots()
+    scope = Scope(ax)
+    application = Main()
 
+    s1 = threading.Thread(target=scope.generate, daemon=True)
+    s2 = threading.Thread(target=application.run, daemon=True)
 
-def cus(frame):
-    axis = xdata[-1] + frame
-    if xdata[-1] > 100 and axis - xdata[-1] < 20: ax.set_xlim(0, axis + 20)
-    xdata.append(axis)
-    ydata.append(ydata[-1] + frame)
-    ln.set_data(xdata, ydata)
-    return ln,
+    s1.start()
+    s2.start()
 
-
-
-
-ani = FuncAnimation(fig, cus, init_func=init, blit=True, interval=100)
-plt.show()
-
-
-
+    scope.start(fig)
+    print('Program Exited')
