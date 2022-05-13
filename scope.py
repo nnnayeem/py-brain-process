@@ -45,10 +45,11 @@ class Scope:
 
     def emitter1(self, p=0.1):
         total_data = len(self.data)
+        print(total_data)
         if total_data > 0:
             while total_data - self.data_pointer - 1 > 0:
                 self.data_pointer = self.data_pointer + 1
-                if total_data > 30:
+                if total_data > 200:
                     yield self.data[self.data_pointer]
                     del self.data[0:self.data_pointer]
                     self.data_pointer = 0
@@ -57,8 +58,35 @@ class Scope:
 
         yield 0.
 
+    def emitter2(self, p=0.1):
+        data = self.data[self.data_pointer:]
+        total_data = len(data)
+        if total_data == 0:
+            data = [0]
+            return iter(data)
+
+        if self.data_pointer > 100:
+            del self.data[0:self.data_pointer]
+            self.data_pointer = 0
+            return iter(data)
+
+        print(self.data_pointer, data)
+
+        self.data_pointer = self.data_pointer + len(data)
+        return iter(data)
+
+    def emitter3(self, p=0.1):
+        total_data = len(self.data)
+
+        if total_data > 0:
+            data = iter(self.data[0:total_data])
+            del self.data[0:total_data]
+            return data
+
+        return iter([0])
+
     def start(self, fig):
-        ani = animation.FuncAnimation(fig, self.update, self.emitter1, interval=50, blit=True)
+        ani = animation.FuncAnimation(fig, self.update, self.emitter3, interval=10, blit=True)
         plt.show()
 
     def generate(self):
@@ -66,16 +94,8 @@ class Scope:
             self.data.append(np.random.rand(1))
             time.sleep(0.01)
 
-
-# Fixing random state for reproducibility
-# np.random.seed(19680801 // 10)
-#
-# fig, ax = plt.subplots()
-# scope = Scope(ax)
-# s1 = threading.Thread(target=scope.generate, daemon=True)
-# s1.start()
-# s2 = threading.Thread(target=scope.start(), daemon=True)
-# s2.start()
+    def set(self, y):
+        self.data.append(y)
 
 
 

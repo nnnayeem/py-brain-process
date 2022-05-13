@@ -10,7 +10,14 @@ class Main:
     def __init__(self):
         print("initiated")
        
-    def run(self):
+    def run(self, scp):
+        # i = 0
+        # while 1:
+        #     time.sleep(0.01)
+        #     i = i + 1
+        #     scp.set(i*0.1)
+        #     if i > 10: i = 0
+
         with serial.Serial('COM4', 115200, timeout=1) as ser:    
             print("Found serial port com1")
             attempt = 0
@@ -38,10 +45,7 @@ if __name__ == "__main__":
     scope = Scope(ax)
     application = Main()
 
-    s1 = threading.Thread(target=scope.generate, daemon=True)
-    s2 = threading.Thread(target=application.run, daemon=True)
-
-    s1.start()
+    s2 = threading.Thread(target=application.run, daemon=True, args=(scope,))
     s2.start()
 
     scope.start(fig)
