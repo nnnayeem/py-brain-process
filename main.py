@@ -19,7 +19,7 @@ class Main:
         #     if i > 10: i = 0
 
         with serial.Serial('COM4', 115200, timeout=1) as ser:    
-            print("Found serial port com1")
+            print("Found serial port com4")
             i = 0
             while 1:
                 if ser.in_waiting > 0:
@@ -27,13 +27,11 @@ class Main:
                     data = data.decode('utf-8')
                     try:
                         val = int(data)
+                        scp.set(val)
                     except ValueError:
                         val = 0
 
-                    scp.set(val)
                     i = i + 1
-                    print(i)
-                    if i == 200: break
                 time.sleep(0.01)
 
 

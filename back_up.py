@@ -1,23 +1,13 @@
 import time
 import serial
-from scope import Scope
-import matplotlib.pyplot as plt
-import threading
+import numpy as np
 
-
-class Main:
+class Main():
 
     def __init__(self):
         print("initiated")
        
-    def run(self, scp):
-        # i = 0
-        # while 1:
-        #     time.sleep(0.01)
-        #     i = i + 1
-        #     scp.set(i*0.1)
-        #     if i > 10: i = 0
-
+    def run(self):
         with serial.Serial('COM4', 115200, timeout=1) as ser:    
             print("Found serial port com1")
             attempt = 0
@@ -41,12 +31,5 @@ class Main:
 
 
 if __name__ == "__main__":
-    fig, ax = plt.subplots()
-    scope = Scope(ax)
-    application = Main()
-
-    s2 = threading.Thread(target=application.run, daemon=True, args=(scope,))
-    s2.start()
-
-    scope.start(fig)
-    print('Program Exited')
+        application = Main()
+        application.run()
